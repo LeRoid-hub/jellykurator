@@ -1,57 +1,27 @@
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.Template.Configuration;
-
+namespace Jellyfin.Plugin.Jellykurator.Configuration;
 /// <summary>
-/// The configuration options.
-/// </summary>
-public enum SomeOptions
-{
-    /// <summary>
-    /// Option one.
-    /// </summary>
-    OneOption,
-
-    /// <summary>
-    /// Second option.
-    /// </summary>
-    AnotherOption
-}
-
-/// <summary>
-/// Plugin configuration.
+/// Plugin configuration
 /// </summary>
 public class PluginConfiguration : BasePluginConfiguration
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="PluginConfiguration"/> class.
+    /// Default constructor for the plugin configuration.
     /// </summary>
     public PluginConfiguration()
     {
-        // set default options here
-        Options = SomeOptions.AnotherOption;
-        TrueFalseSetting = true;
-        AnInteger = 2;
-        AString = "string";
+        Host = "";
+        Token = "";
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
+    /// The host URL for the Jellykurator service.
     /// </summary>
-    public bool TrueFalseSetting { get; set; }
-
+    public string Host { get; set; }
+    
     /// <summary>
-    /// Gets or sets an integer setting.
+    /// The authentication token for the Jellykurator service.
     /// </summary>
-    public int AnInteger { get; set; }
-
-    /// <summary>
-    /// Gets or sets a string setting.
-    /// </summary>
-    public string AString { get; set; }
-
-    /// <summary>
-    /// Gets or sets an enum option.
-    /// </summary>
-    public SomeOptions Options { get; set; }
+    public string Token { get; set; }
 }

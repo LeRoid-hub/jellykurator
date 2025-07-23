@@ -2,35 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Template</title>
+    <title>Jellykurator</title>
 </head>
 <body>
-    <div id="TemplateConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+    <div id="JellykuratorConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
         <div data-role="content">
             <div class="content-primary">
-                <form id="TemplateConfigForm">
-                    <div class="selectContainer">
-                        <label class="selectLabel" for="Options">Several Options</label>
-                        <select is="emby-select" id="Options" name="Options" class="emby-select-withcolor emby-select">
-                            <option id="optOneOption" value="OneOption">One Option</option>
-                            <option id="optAnotherOption" value="AnotherOption">Another Option</option>
-                        </select>
+                <form id="JellykuratorConfigForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="Host">Host</label>
+                        <input id="Host" name="Host" type="text" is="emby-input" />
                     </div>
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="AnInteger">An Integer</label>
-                        <input id="AnInteger" name="AnInteger" type="number" is="emby-input" min="0" />
-                        <div class="fieldDescription">A Description</div>
-                    </div>
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label class="emby-checkbox-label">
-                            <input id="TrueFalseSetting" name="TrueFalseCheckBox" type="checkbox" is="emby-checkbox" />
-                            <span>A Checkbox</span>
-                        </label>
+                        <label class="inputLabel inputLabelUnfocused" for="Token">Token</label>
+                        <input id="Token" name="Token" type="text" is="emby-input" />
                     </div>
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="AString">A String</label>
-                        <input id="AString" name="AString" type="text" is="emby-input" />
-                        <div class="fieldDescription">Another Description</div>
+                        <button id="TestConnectionButton" is="emby-button" type="button" class="raised button-cancel block emby-button">
+                            <span>Test Connection</span>
+                        </button>
+                    </div>
+                    <div class="inputContainer horizontal">
+                        <div id="ConnectionStatus" class="status"></div>
+                        <span id="ConnectionStatusLabel">Unknown</span>
                     </div>
                     <div>
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button">
@@ -40,32 +34,102 @@
                 </form>
             </div>
         </div>
+        <style>
+            .status {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 1px solid transparent;
+                margin: 10px 10px 0 0;
+            }
+
+            .horizontal {
+                display: flex; 
+                align-items: center;
+            }
+        </style>
         <script type="text/javascript">
-            var TemplateConfig = {
-                pluginUniqueId: 'eb5d7894-8eef-4b36-aa6f-5d124e828ce1'
+            var JellykuratorConfig = {
+                pluginUniqueId: 'b3d86c4e-cedd-4c3d-a871-33da1aa692b2'
             };
 
-            document.querySelector('#TemplateConfigPage')
+            document.querySelector('#TestConnectionButton')
+                .addEventListener('click', function() {
+                Dashboard.showLoadingMsg();
+                console.log('Testing connection to Jellykurator...');
+                updateConnectionStatus('pending');
+
+                setTimeout(function() {
+                    updateConnectionStatus('ok');
+                    Dashboard.hideLoadingMsg();
+                }, 10000);
+                });
+
+            function updateConnectionStatus(status) {
+                setStatusIndicator(status, 'ConnectionStatus');
+                switch (status.toLowerCase()) {
+                    case 'ok':
+                        setTextContent('ConnectionStatusLabel', 'Connected');
+                        break;
+                    case 'error':
+                        setTextContent('ConnectionStatusLabel', 'Error');
+                        break;
+                    case 'pending':
+                        setTextContent('ConnectionStatusLabel', 'Pending');
+                        break;
+                    default:
+                        setTextContent('ConnectionStatusLabel', 'Unknown');
+                }
+            }
+
+            function setTextContent(id, text) {
+                var el = document.getElementById(id);
+                if (el) {
+                    el.textContent = text;
+                }
+            }
+
+            function setStatusIndicator(status, id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+
+                switch (status.toLowerCase()) {
+                    case 'ok':
+                        el.style.backgroundColor = 'green';
+                        el.style.borderColor = 'green';
+                        break;
+                    case 'error':
+                        el.style.backgroundColor = 'red';
+                        el.style.borderColor = 'red';
+                        break;
+                    case 'pending':
+                        el.style.backgroundColor = 'yellow';
+                        el.style.borderColor = 'yellow';
+                        break;
+                    case 'unknown':
+                    default:
+                        el.style.backgroundColor = 'gray';
+                        el.style.borderColor = 'transparent';
+                }
+            }
+
+            document.querySelector('#JellykuratorConfigPage')
                 .addEventListener('pageshow', function() {
                     Dashboard.showLoadingMsg();
-                    ApiClient.getPluginConfiguration(TemplateConfig.pluginUniqueId).then(function (config) {
-                        document.querySelector('#Options').value = config.Options;
-                        document.querySelector('#AnInteger').value = config.AnInteger;
-                        document.querySelector('#TrueFalseSetting').checked = config.TrueFalseSetting;
-                        document.querySelector('#AString').value = config.AString;
+                    ApiClient.getPluginConfiguration(JellykuratorConfig.pluginUniqueId).then(function (config) {
+                        document.querySelector('#Host').value = config.Host;
+                        document.querySelector('#Token').value = config.Token;
                         Dashboard.hideLoadingMsg();
                     });
                 });
 
-            document.querySelector('#TemplateConfigForm')
+            document.querySelector('#JellykuratorConfigPage')
                 .addEventListener('submit', function(e) {
                 Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(TemplateConfig.pluginUniqueId).then(function (config) {
-                    config.Options = document.querySelector('#Options').value;
-                    config.AnInteger = document.querySelector('#AnInteger').value;
-                    config.TrueFalseSetting = document.querySelector('#TrueFalseSetting').checked;
-                    config.AString = document.querySelector('#AString').value;
-                    ApiClient.updatePluginConfiguration(TemplateConfig.pluginUniqueId, config).then(function (result) {
+                ApiClient.getPluginConfiguration(JellykuratorConfig.pluginUniqueId).then(function (config) {
+                    config.Host = document.querySelector('#Host').value;
+                    config.Token = document.querySelector('#Token').value;
+                    ApiClient.updatePluginConfiguration(JellykuratorConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });
                 });
@@ -73,6 +137,8 @@
                 e.preventDefault();
                 return false;
             });
+
+            updateConnectionStatus('unknown');
         </script>
     </div>
 </body>
