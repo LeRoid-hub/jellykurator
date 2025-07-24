@@ -138,6 +138,54 @@ public class JellykuratorPlugin : BasePlugin<PluginConfiguration>, IHasWebPages,
                 Recursive = true
             }).OfType<Series>();
 
+            foreach (var serie in series) {
+                var providerIds = new Dictionary<string, object>();
+                if (serie.ProviderIds != null) {
+                    foreach (var provider in serie.ProviderIds)
+                    {
+                        providerIds[provider.Key] = provider.Value;
+                    }
+                }
+
+                var seasons = _libraryManager.GetItemList(new InternalItemsQuery
+                {
+                    AncestorIds = new[] { serie.Id },
+                    IncludeItemTypes = new[] { BaseItemKind.Season },
+                    Recursive = true
+                }).OfType<Season>().OrderBy(s => s.IndexNumber ?? 0);
+                var seasonData = new List<object>();
+                foreach (var season in seasons) {
+                    var episodes = _libraryManager.GetItemList(new InternalItemsQuery{
+                        AncestorIds = new[] { season.Id },
+                        IncludeItemTypes = new[] { BaseItemKind.Episode },
+                        Recursive = true
+                    }).OfType<Episode>().OrderBy(e => e.IndexNumber ?? 0);
+
+                    var episodeData = episodes.Select(episode => new {
+                        episode_number = episode.IndexNumber ?? 0,
+                        name = episode.Name,
+                        id = episode.Id.ToString()
+                    }).ToList();
+                    
+                    seasonData.Add(new 
+                    {
+                        season_number = season.IndexNumber ?? 0,
+                        name = season.Name,
+                        id = season.Id.ToString(),
+                        episodes = episodeData
+                    });
+                }
+
+                mediaItems.Add(new
+                {
+                    type = "Series",
+                    id = serie.Id.ToString(),
+                    name = serie.Name,
+                    originalTitle = serie.OriginalTitle,
+                    metadata_refs = providerIds,
+                    seasons = seasonData
+                });
+            }
 
             var samplesToLog = Math.Min(3, mediaItems.Count);
             for (int i = 0; i < samplesToLog; i++)
