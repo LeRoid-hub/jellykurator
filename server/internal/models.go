@@ -12,15 +12,17 @@ type TvShow struct {
 	Name          string
 	OriginalTitle string
 	Imdb          string
+	Season        []Season
 }
 
 type Season struct {
 	ID           int
 	Name         string
 	SeasonNumber int
+	Episode      []Episode
 }
 
-type Episodes struct {
+type Episode struct {
 	ID            int
 	Name          string
 	EpisodeNumber int
