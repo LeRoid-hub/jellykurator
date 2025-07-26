@@ -1,0 +1,17 @@
+{
+  "type": "Movie",
+  "id": "70943c66-ed91-506e-1d22-9d2714bc1c41",
+  "name": "Death Note",
+  "originalTitle": "デスノート",
+  "metadata_refs": [
+    {
+      "TmdbCollection": "102019"
+    },
+    {
+      "Imdb": "tt0758742"
+    },
+    {
+      "Tmdb": "16007"
+    }
+  ]
+}

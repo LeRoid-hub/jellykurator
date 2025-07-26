@@ -1,0 +1,41 @@
+{
+  "type": "Series",
+  "id": "00ab1781-8b62-237b-1d56-b74a0dc641ad",
+  "name": "Heidi",
+  "originalTitle": "アルプスの少女ハイジ",
+  "metadata_refs": [
+    {
+      "Imdb": "tt0070968"
+    },
+    {
+      "Tmdb": "29452"
+    },
+    {
+      "Tvdb": "82927"
+    }
+  ],
+  "seasons": [
+    {
+      "season_number": 1,
+      "name": "Staffel 1",
+      "id": "be0db1c2-6abe-b809-5b5a-9135bee9fe02",
+      "episodes": [
+        {
+          "episode_number": 1,
+          "name": "Der geheimnisvolle Großvater",
+          "id": "546200e7-b51c-2990-8c87-139399d64224"
+        },
+        {
+          "episode_number": 2,
+          "name": "Großvaters Hütte",
+          "id": "c8e0f7ab-474d-9fd8-60f2-43700f9337cd"
+        },
+        {
+          "episode_number": 3,
+          "name": "Auf der Weide",
+          "id": "2dedcbde-35d3-8620-d050-33158badd154"
+        }
+      ]
+    }
+  ]
+}
