@@ -1,21 +1,12 @@
 package internal
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
-func Sort(jsondata string) {
+func Sort(data map[string]interface{}) {
 	var movielist []Movie
 	var tvshowlist []TvShow
-
-	var data map[string]interface{}
-
-	err := json.Unmarshal([]byte(jsondata), &data)
-	if err != nil {
-		fmt.Printf("could not unmarshal json: %s\n", err)
-		return
-	}
 
 	for _, content := range data {
 		contentMap, ok := content.(map[string]interface{})

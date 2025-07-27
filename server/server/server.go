@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 
-	"github.com/LeRoid-hub/jellykurator/server/database"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,11 +14,11 @@ var (
 func Run(env map[string]string) {
 	Env = env
 
-	db, err := database.New()
+	/*db, err := database.New()
 	if err != nil {
 		panic("Failed to connect to the database: " + err.Error())
 	}
-	Database = db
+	Database = db*/
 
 	r := gin.Default()
 
@@ -30,7 +29,7 @@ func Run(env map[string]string) {
 		v1.GET("/", welcome)
 
 		//Plugin interaction endpoints
-		v1.POST("/upload", authCheck, upload)
+		v1.POST("/upload", upload) //add authcheck
 		v1.POST("/checkauth", authCheck, checkAuth)
 
 		//User
