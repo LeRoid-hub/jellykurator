@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.Jellykurator.Configuration;
@@ -78,6 +79,33 @@ public class JellykuratorPlugin : BasePlugin<PluginConfiguration>, IHasWebPages,
                 EmbeddedResourcePath = string.Format(CultureInfo.InvariantCulture, "{0}.Configuration.configPage.html", GetType().Namespace)
             }
         ];
+    }
+
+    private async Task SendMediaItemsAsync(List<object> mediaItems, string url, string token) {
+        var json = JsonSerializer.Serialize(mediaItems, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, url + "/v1/upload")
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+
+        request.Headers.Add("Authorization", $"Bearer {token}");
+
+        var response = await _httpClient.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            _logger.LogInformation("Jellykurator: Successfully sent media items to {Url}", url);
+        }
+        else
+        {
+            _logger.LogError("Jellykurator: Failed to send media items. Status code: {StatusCode}, Reason: {ReasonPhrase}",
+                response.StatusCode, response.ReasonPhrase);
+        }
     }
 
     private void DoExport(object? state)
@@ -161,10 +189,22 @@ public class JellykuratorPlugin : BasePlugin<PluginConfiguration>, IHasWebPages,
                         Recursive = true
                     }).OfType<Episode>().OrderBy(e => e.IndexNumber ?? 0);
 
-                    var episodeData = episodes.Select(episode => new {
-                        episode_number = episode.IndexNumber ?? 0,
-                        name = episode.Name,
-                        id = episode.Id.ToString()
+                    var episodeData = episodes.Select(episode => {
+
+                        var episodeProviderIds = new Dictionary<string, object>();
+                        if (episode.ProviderIds != null) {
+                            foreach (var provider in episode.ProviderIds)
+                            {
+                                episodeProviderIds[provider.Key] = provider.Value;
+                            }
+                        }
+
+                        return new {
+                            episode_number = episode.IndexNumber ?? 0,
+                            name = episode.Name,
+                            id = episode.Id.ToString(),
+                            metadata_refs = episodeProviderIds
+                        };
                     }).ToList();
                     
                     seasonData.Add(new 
@@ -195,6 +235,8 @@ public class JellykuratorPlugin : BasePlugin<PluginConfiguration>, IHasWebPages,
             _logger.LogInformation("Jellykurator: Found {MovieCount} movies", movies.Count());
             _logger.LogInformation("Jellykurator: Found {SeriesCount} series", series.Count());
             _logger.LogInformation("Jellykurator: Export completed");
+
+            SendMediaItemsAsync(mediaItems, url, token);
         }
         catch (Exception ex)
         {
